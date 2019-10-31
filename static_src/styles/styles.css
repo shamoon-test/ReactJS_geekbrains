@@ -1,0 +1,70 @@
+body,html{
+    overflow: hidden;
+    margin: 0;
+}
+.message-field {
+    display: flex;
+    flex-direction: column;
+    background-color: #e2e2e2;
+    height:100%; 
+    padding: 0; 
+    margin: 0;
+    width: 100%;
+    overflow-y: scroll;
+ }
+
+ .chatList {
+    height: 90vh;
+    display: flex;
+    flex: 0.2;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    background-color: #f0f0f0;
+ }
+
+ .layout {
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+ }
+
+ .messageContainer{
+    display: flex;
+    flex: 0.8;
+    height: 90vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+ }
+
+ .message {
+    background-color: lightblue;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    margin: 5px;
+ }
+ 
+ .message-sender {
+    color: gray;
+    font-size: 14px;
+ }
+
+ .header {
+   background-color: #f0f0f0;
+   height: 10vh;
+   margin: 0;
+   display: flex;
+   flex: 1;
+   justify-content: center;
+   align-items: center;
+ }
+
+ .inputField{
+    width: 100%;
+    display: flex;
+    background-color: #f0f0f0;
+ }

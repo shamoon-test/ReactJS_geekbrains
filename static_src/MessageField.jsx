@@ -1,5 +1,8 @@
 import React from 'react';
 import Message from './Message';
+import { TextField, FloatingActionButton } from 'material-ui';
+import SendIcon from 'material-ui/svg-icons/content/send';
+import './styles/styles.css';
 
 
 const botAnswers = ['Отстань, я робот', 'Кто такая Сири????!!!', 'Поговорите лучше с Алисой', 'Тебе конец, кожаный мешок'];
@@ -10,31 +13,70 @@ function randomChoice(arr) {
 
 export default class MessageField extends React.Component {
     state = {
-        messages: [{text: 'Привет!', author: 'Human'}, {text: 'Как дела?', author: 'Human'}],
+        messages: [{ text: 'Привет!', sender: 'bot' }, { text: 'Как дела?', sender: 'bot' }],
+        input: '',
     };
 
-    componentDidUpdate() {
-        const { messages } = this.state;
-        if (messages[messages.length-1].author !== 'Bot') {
-            setTimeout(() => this.setState({ 'messages': [...messages, {text: randomChoice(botAnswers), author: 'Bot'}] }), 0);
+    componentDidUpdate(prevProps, prevState) {
+        if ((this.state.messages[this.state.messages.length - 1].sender !== 'bot')
+            && prevState.messages.length < this.state.messages.length) {
+            setTimeout(() => this.setState({ 'messages': [...this.state.messages, { text: randomChoice(botAnswers), sender: 'bot' }] }), 1000);
         }
+        this.scrollToBottom();
     }
 
-    handleSendMessage = () => {
-        const { messages } = this.state;
-        this.setState({ 'messages': [...messages, {text: 'Нормально', author: 'Human'}]});
+    sendMessage = (message) => {
+        if (message !== '')
+            this.setState({ messages: [...this.state.messages, { text: message, sender: 'me' }] });
     };
 
-    render() {
-        const { messages } = this.state;
+    handleClick = (message) => {
+        this.sendMessage(message)
+    }
 
-        const messageElements = messages.map(message => <Message key={ message.text } text={ message.text } author={message.author} />);
+    handleChange = (event) => {
+        this.setState({ input: event.target.value });
+    };
+
+    handleKeyUp = (event, message) => {
+        if (event.keyCode === 13) { // Enter
+            this.sendMessage(message)
+            this.setState({ input: '' })
+        }
+    };
+    scrollToBottom = () => {
+        this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    }
+    render() {
+        const { messages, index } = this.state;
+
+        const messageElements = messages.map(message => <Message key={index} text={message.text} sender={message.sender} />);
 
         return (
-            <div>
-                <h1>Чат</h1>
-                { messageElements }
-                <button onClick={ this.handleSendMessage }>Отправить сообщение</button>
+            <div className="messageContainer">
+                <div className="message-field">
+                    {messageElements}
+                    <div style={{ float: "left", clear: "both" }}
+                        ref={(el) => { this.messagesEnd = el; }}>
+                    </div>
+                </div>
+
+                <div className="inputField">
+                    <TextField
+                        ref={this.textInput}
+                        name="input"
+                        fullWidth={true}
+                        hintText="Введите сообщение"
+                        style={{ fontSize: '22px' }}
+                        onChange={this.handleChange}
+                        value={this.state.input}
+                        onKeyUp={(event) => this.handleKeyUp(event, this.state.input)}
+                    />
+                    <FloatingActionButton onClick={() => this.handleClick(this.state.input)}>
+                        <SendIcon />
+                    </FloatingActionButton>
+                </div>
+
             </div>
         )
     }
