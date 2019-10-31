@@ -3,35 +3,29 @@ import Message from './Message';
 import { TextField, FloatingActionButton } from 'material-ui';
 import SendIcon from 'material-ui/svg-icons/content/send';
 import './styles/styles.css';
+import PropTypes from 'prop-types';
 
-
-const botAnswers = ['Отстань, я робот', 'Кто такая Сири????!!!', 'Поговорите лучше с Алисой', 'Тебе конец, кожаный мешок'];
-
-function randomChoice(arr) {
-    return arr[Math.floor(arr.length * Math.random())];
-}
 
 export default class MessageField extends React.Component {
+    static propTypes = {
+        chatId: PropTypes.number,
+        chats: PropTypes.array.isRequired,
+        messages: PropTypes.array.isRequired,
+        sendMessage: PropTypes.func.isRequired
+    }
+    static defaultProps = {
+        chatId: 1
+    }
     state = {
-        messages: [{ text: 'Привет!', sender: 'bot' }, { text: 'Как дела?', sender: 'bot' }],
         input: '',
     };
 
     componentDidUpdate(prevProps, prevState) {
-        if ((this.state.messages[this.state.messages.length - 1].sender !== 'bot')
-            && prevState.messages.length < this.state.messages.length) {
-            setTimeout(() => this.setState({ 'messages': [...this.state.messages, { text: randomChoice(botAnswers), sender: 'bot' }] }), 1000);
-        }
         this.scrollToBottom();
     }
 
-    sendMessage = (message) => {
-        if (message !== '')
-            this.setState({ messages: [...this.state.messages, { text: message, sender: 'me' }] });
-    };
-
     handleClick = (message) => {
-        this.sendMessage(message)
+        this.props.sendMessage(message)
     }
 
     handleChange = (event) => {
@@ -40,7 +34,7 @@ export default class MessageField extends React.Component {
 
     handleKeyUp = (event, message) => {
         if (event.keyCode === 13) { // Enter
-            this.sendMessage(message)
+            this.props.sendMessage(message, 'me')
             this.setState({ input: '' })
         }
     };
@@ -48,9 +42,9 @@ export default class MessageField extends React.Component {
         this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     }
     render() {
-        const { messages, index } = this.state;
-
-        const messageElements = messages.map(message => <Message key={index} text={message.text} sender={message.sender} />);
+        
+        const { chatId } = this.props;
+        const messageElements = this.props.chats[chatId - 1].map(messageId => <Message key={messageId} text={this.props.messages[messageId - 1].text} sender={this.props.messages[messageId - 1].sender} />);
 
         return (
             <div className="messageContainer">
@@ -72,7 +66,7 @@ export default class MessageField extends React.Component {
                         value={this.state.input}
                         onKeyUp={(event) => this.handleKeyUp(event, this.state.input)}
                     />
-                    <FloatingActionButton onClick={() => this.handleClick(this.state.input)}>
+                    <FloatingActionButton onClick={() => this.props.sendMessage(this.state.input, 'me')}>
                         <SendIcon />
                     </FloatingActionButton>
                 </div>
